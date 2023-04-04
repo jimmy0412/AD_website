@@ -9,4 +9,5 @@ services:
     stop_signal: SIGINT
     ports:
       - '8000:8000'
-
+    expose:
+      - 8888
