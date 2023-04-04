@@ -5,4 +5,4 @@ COPY . /app
 RUN apt-get update
 RUN pip install -U flask flask-sqlalchemy 
 
-CMD run python3 app.py
+CMD python3 app.py
