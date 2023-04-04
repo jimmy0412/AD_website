@@ -1,11 +1,13 @@
-FROM python:3.10-buster
-RUN mkdir /app
+# syntax=docker/dockerfile:1.4
+FROM --platform=$BUILDPLATFORM python:3.10-alpine AS builder
+
 WORKDIR /app
-COPY ./app /app
-RUN apt-get update
-RUN pip install --upgrade pip
-RUN pip install -U flask flask-sqlalchemy
 
-ENV FLASK_APP=app
+COPY requirements.txt /app
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install -r requirements.txt
 
-CMD python3 app2.py
+COPY . /app
+
+ENTRYPOINT ["python3"]
+CMD ["app.py"]

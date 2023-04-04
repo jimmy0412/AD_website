@@ -1,12 +1,9 @@
 from flask import Flask
-from gevent import pywsgi
 app = Flask(__name__)
 
-@app.route("/")
+@app.route('/')
 def hello():
-    return "Hello, World!"
-
+	return "Hello World!"
 
 if __name__ == '__main__':
-    server = pywsgi.WSGIServer(('0.0.0.0',5000),app)
-    server.serve_forever()
+	app.run(host='0.0.0.0', port=8000)
