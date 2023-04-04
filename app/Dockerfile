@@ -1,4 +1,5 @@
 FROM python:3.10-buster
+RUN mkdir /app
 WORKDIR /app
 COPY ./app /app
 RUN apt-get update
