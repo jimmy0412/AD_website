@@ -6,6 +6,8 @@ COPY ./app /app
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install -r requirements.txt
 
+RUN pip install pandas
+
 ENTRYPOINT ["python3"]
 CMD ["app.py"]
 
