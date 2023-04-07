@@ -58,17 +58,20 @@ def create_user():
 @app.route("/login", methods=['POST'])
 def login():
 
+    # already login 
+    if 'user_data' in session:
+        return redirect('/')    
 
-    # chechk password
+    # check password
     def valid_user(user,password):
         return user.password == password
-    # check password 
+
     def is_blank(username,password):
         return len(password) < 1 and len(username) < 1 
     
     def is_only_number_letter(username,password):
         return regex.match(username) and  regex.match(password)
-    
+
     username = request.form.get('username')
     password = request.form.get('password')
 
@@ -78,11 +81,11 @@ def login():
        # no blank input 
         if is_blank(username,password):
             flash("Username are blank or Password are blank")
-            return redirect("/")
+            return redirect("/create_user")
         
         if not is_only_number_letter(username,password):
             flash("Only numbers, letters and dashes are allowed")
-            return redirect("/")
+            return redirect("/create_user")
 
         ### create user to db 
         new_user = User(username,password)
@@ -96,8 +99,8 @@ def login():
         return redirect('user')
 
     elif not valid_user(user,password):
-        #flash('User already exists or Password Error')
-        return "not valid"
+        flash('User already exists or Password Error')
+        return redirect("/create_user")
     
     data = '{"username" : "%s"}' %(username)
     session['user_data'] = data
@@ -115,7 +118,7 @@ def user():
     user_table = pd.read_sql_table(table_name="users", con=engine)
     result = user_table[["id","username"]].to_json(orient="records")
     parsed = json.loads(result)  
-    result = json.dumps(parsed, indent=4) 
+    result = json.dumps(parsed, indent=4)
     print(result)
     return render_template('user.html',user_data=result)
 
