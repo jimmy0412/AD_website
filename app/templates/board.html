@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block content %}
+{% autoescape true %}
+
+{% for message in message_list %}
+<div class="container text-center alert alert-primary ">
+    {% if message.is_deleted == 0 %}
+
+        {% if message.username == username %}
+        <h4 class="p-3">{{message.username}} say : {{message.message}} at {{message.timestamp}} </h4>
+        <form action="/delete_message" method="post">
+            <input type="hidden" name="msg_id" value="{{message.id}}">
+            <button class="btn btn-danger" role="button">Delete Message</button>
+        </form>
+        {% else %}
+        <h4 class="p-3">{{message.username}} say : {{message.message}} at {{message.timestamp}} </h4>
+        
+        {% endif %}
+
+    {% else %}
+
+    <h4 class="p-3">{{message.username}} say : Message Deleted at {{message.timestamp}} </h4>
+
+    {% endif %}
+</div>
+
+{% endfor %}
+
+<div class="d-grid gap-3 p-5">
+    <div class="container text-center alert alert-success ">
+        <h3 class="title mb-3">Message Box</h3>
+        <div class="box">
+            {% with messages = get_flashed_messages() %} {% if messages %}
+            <div class="alert alert-danger" role="alert">
+                {{ messages[0] }}
+            </div>
+            {% endif %} {% endwith %}
+            <div class="col align-self-center">
+                <form method="POST" action="/add_message">
+                    <div class="input-group-append mb-3">
+                        <div class="control">
+                            <input class="form-control" type="message" name="message" placeholder="New Message"
+                                autofocus="" required>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block mb-4">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endautoescape %}
+{% endblock %}
