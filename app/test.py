@@ -31,11 +31,11 @@ class Message(db.Model):
     __tablename__ = 'message'
     
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    username = db.Column(db.String(30),nullable=False)
+    user_id = db.Column(db.Integer,nullable=False)
     message = db.Column(db.String(256),nullable=False)
     
-    def __init__(self, username ,message):
-        self.username = username
+    def __init__(self, user_id ,message):
+        self.user_id = user_id
         self.message = message
 
 
@@ -98,10 +98,13 @@ def login():
 
         return redirect('user')
 
+    ## input != password
     elif not valid_user(user,password):
         flash('User already exists or Password Error')
         return redirect("/create_user")
     
+    ### valid user 
+
     data = '{"username" : "%s"}' %(username)
     session['user_data'] = data
     return redirect("/")
