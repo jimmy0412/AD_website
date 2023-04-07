@@ -121,7 +121,7 @@ def logout():
 
 @app.route('/user')
 def user():
-    engine = create_engine(sql_url, echo = False)
+    engine = create_engine(os.environ['SQLALCHEMY_DATABASE_URI'], echo = False)
     user_table = pd.read_sql_table(table_name="users", con=engine)
     result = user_table[["id","username"]].to_json(orient="records")
     parsed = json.loads(result)  
@@ -204,7 +204,7 @@ def bbbbb():
 @app.route('/check_user_db_fjkdlsjflkdsjflkjdslkfjldskjfldsk')
 def check_user_db():
     #ref https://stackoverflow.com/questions/38151817/sqlalchemy-print-contents-of-table
-    engine = create_engine(sql_url, echo = False)
+    engine = create_engine(os.environ['SQLALCHEMY_DATABASE_URI'], echo = False)
     user_table = pd.read_sql_table(table_name="users", con=engine)
     result = user_table.to_json(orient="records")
     parsed = json.loads(result)  
@@ -214,7 +214,7 @@ def check_user_db():
 @app.route('/check_message_db_fklsdkjflkjdsflkjdlsf')
 def check_message_db():
     #ref https://stackoverflow.com/questions/38151817/sqlalchemy-print-contents-of-table
-    engine = create_engine(sql_url, echo = False)
+    engine = create_engine(os.environ['SQLALCHEMY_DATABASE_URI'], echo = False)
     user_table = pd.read_sql_table(table_name="message", con=engine)
     result = user_table.to_json(orient="records")
     parsed = json.loads(result)  
