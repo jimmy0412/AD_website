@@ -114,7 +114,7 @@ def logout():
 
 @app.route('/user')
 def user():
-    engine = create_engine(sql_url, echo = False)
+    engine = create_engine(os.environ['SQLALCHEMY_DATABASE_URI'], echo = False)
     user_table = pd.read_sql_table(table_name="users", con=engine)
     result = user_table[["id","username"]].to_json(orient="records")
     parsed = json.loads(result)  
