@@ -14,10 +14,8 @@ app.secret_key = os.urandom(32)
 #############
 
 # ref : https://stackabuse.com/using-sqlalchemy-with-flask-and-postgresql/	
-sql_url = "postgresql://clg5zsopy000xf4pofq5zcri2:x8fmrT8rZHITG6zm195f8Pau@140.112.18.210:9015/clg5zsoq0000zf4pohh07fyob"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = sql_url
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 db = SQLAlchemy(app)
 
 ### setup timezone
