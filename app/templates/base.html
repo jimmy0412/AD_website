@@ -13,6 +13,8 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="/static/styles.css" rel="stylesheet" />
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" /> -->
+    <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -32,7 +34,8 @@
                             role="button" data-bs-toggle="dropdown" aria-expanded="false">User</a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('user') }}">User List</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('create_user') }}">Create User</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('create_user') }}">Login</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('upload_img') }}">Upload Img</a></li>
                             <li>
                                 <hr class="dropdown-divider" />
                             </li>

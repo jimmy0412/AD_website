@@ -1,0 +1,75 @@
+{% extends "base.html" %} {% block content %}
+{% autoescape true %}
+
+{% for message in message_list %}
+<div class="container-sm  alert alert-primary ">
+    <div class="row">
+        <div class="col-sm-1">
+            <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" width="50" height="50"
+                class="float-left rounded">
+        </div>
+            {% if message.is_deleted == 0 %}
+
+            {% if message.user.username == username %}
+            <div class="col-sm-2">{{message.user.username}} </div>
+            <h4 class="p-3">{{message.message}} at {{message.timestamp}} </h4>
+            <form action="/delete_message" method="post">
+                <input type="hidden" name="msg_id" value="{{message.id}}">
+                <button class="btn btn-danger" role="button">Delete Message</button>
+            </form>
+            {% else %}
+            <div class="col-sm-2">{{message.user.username}} </div>
+            <h4 class="p-3"> {{message.message}} at {{message.timestamp}} </h4>
+
+            {% endif %}
+
+            {% else %}
+            <div class="col-sm-2">{{message.user.username}} </div>
+            <h4 class="p-3">Message Deleted at {{message.timestamp}} </h4>
+
+            {% endif %}
+    </div>
+
+</div>
+
+{% endfor %}
+
+<div class="d-grid gap-3 p-5">
+    <div class="container text-center alert alert-success ">
+        <h3 class="title mb-3">Message Box</h3>
+        <div class="box">
+            {% with messages = get_flashed_messages() %} {% if messages %}
+            <div class="alert alert-danger" role="alert">
+                {{ messages[0] }}
+            </div>
+            {% endif %} {% endwith %}
+            <div class="col align-self-center">
+                <form method="POST" action="/add_message">
+                    <div class="input-group-append mb-3">
+                        <div class="control">
+                            <textarea class="form-control" placeholder="New Message" rows="3" name="message"></textarea>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block mb-4">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<main role="main" class="container bootdey.com">
+    <div class="my-3 p-3 bg-white rounded box-shadow">
+      <h6 class="border-bottom border-gray pb-2 mb-0">Recent updates</h6>
+      <div class="media text-muted pt-3">
+        <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-2 rounded" width="32" height="32">
+        <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+          <strong class="d-block text-gray-dark">{{message.user.username}}</strong>
+          {{message.message}}
+        </p>
+      </div>
+    </div>
+</main>
+{% endautoescape %}
+
+
+{% endblock %}

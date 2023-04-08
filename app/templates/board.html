@@ -1,29 +1,74 @@
 {% extends "base.html" %} {% block content %}
 {% autoescape true %}
 
-{% for message in message_list %}
-<div class="container text-center alert alert-primary ">
-    {% if message.is_deleted == 0 %}
 
-        {% if message.username == username %}
-        <h4 class="p-3">{{message.username}} say : {{message.message}} at {{message.timestamp}} </h4>
-        <form action="/delete_message" method="post">
-            <input type="hidden" name="msg_id" value="{{message.id}}">
-            <button class="btn btn-danger" role="button">Delete Message</button>
-        </form>
+<div class="container-sm  alert alert-primary ">
+    <main role="main" class="container bootdey.com">
+        {% for message in message_list %}
+        {% if message.is_deleted == 0 %}
+
+        {% if message.user.username == session['username'] %}
+
+        <div class="my-3 p-3 bg-white rounded box-shadow">
+            <div class="media text-muted pt-3">
+                <div class="row justify-content-between">
+                    <div class="col-4">
+                        <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-3 rounded" width="32" height="32">
+                    </div>
+                    <div class="col-2">
+                        <form action="/delete_message" method="post">
+                            <input type="hidden" name="msg_id" value="{{message.id}}">
+                            <button class="btn btn-danger" role="button" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"><i class="fa fa-trash"></i></button>
+                        </form>
+                    </div>
+
+                </div>
+
+                <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                    <strong class="d-block text-gray-dark">@{{message.user.username}}</strong>
+                    {{message.message}}
+
+                </p>
+
+            </div>
+
+        </div>
+
         {% else %}
-        <h4 class="p-3">{{message.username}} say : {{message.message}} at {{message.timestamp}} </h4>
-        
+
+        <div class="my-3 p-3 bg-white rounded box-shadow">
+            <div class="media text-muted pt-3">
+                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-2 rounded"
+                    width="32" height="32">
+                <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                    <strong class="d-block text-gray-dark">@{{message.user.username}}</strong>
+                    {{message.message}}
+                </p>
+            </div>
+        </div>
+
         {% endif %}
 
-    {% else %}
+        {% else %}
 
-    <h4 class="p-3">{{message.username}} say : Message Deleted at {{message.timestamp}} </h4>
+        <div class="my-3 p-3 bg-white rounded box-shadow">
+            <div class="media text-muted pt-3">
+                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-2 rounded"
+                    width="32" height="32">
+                <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                    <strong class="d-block text-gray-dark">@{{message.user.username}}</strong>
+                    Message Delete
+                </p>
+            </div>
+        </div>
 
-    {% endif %}
+
+        {% endif %}
+        {% endfor %}
+    </main>
 </div>
 
-{% endfor %}
+
 
 <div class="d-grid gap-3 p-5">
     <div class="container text-center alert alert-success ">
@@ -38,8 +83,7 @@
                 <form method="POST" action="/add_message">
                     <div class="input-group-append mb-3">
                         <div class="control">
-                            <input class="form-control" type="message" name="message" placeholder="New Message"
-                                autofocus="" required>
+                            <textarea class="form-control" placeholder="New Message" rows="3" name="message"></textarea>
                         </div>
                     </div>
 
@@ -50,4 +94,6 @@
     </div>
 </div>
 {% endautoescape %}
+
+
 {% endblock %}

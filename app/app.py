@@ -5,7 +5,7 @@ import pandas as pd
 import os
 import json
 import re
-from datetime import datetime, timezone, timedelta
+
 app = Flask(__name__)
 app.secret_key = os.urandom(32)
 
@@ -19,10 +19,21 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 db = SQLAlchemy(app)
 
 ### setup timezone
-
+from datetime import datetime, timezone, timedelta
 tz = timezone(timedelta(hours=+8))
 
+################
+### setup upload
+################
+import filetype
+from werkzeug.utils import secure_filename
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+app.config['UPLOAD_PATH'] = os.path.join('static','img')
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  ## 2MB
+
 regex = re.compile(r'^[A-Za-z0-9_-]*$')
+
+## TODO : init a betray account
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -30,22 +41,24 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
     username = db.Column(db.String(30),unique=True,nullable=False)
     password = db.Column(db.String(30),nullable=False)
-    
+    img_name = db.Column(db.String(50),nullable=False)
+
     def __init__(self,username,password):
         self.username = username
         self.password = password
+        self.img_name = 'bible.jpg'
 
 class Message(db.Model):
     __tablename__ = 'message'
     
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    username = db.Column(db.String(30),nullable=False)
     message = db.Column(db.String(256),nullable=False)
     is_deleted = db.Column(db.Boolean)
     timestamp =  db.Column(db.String(256),nullable=False)
+    uid = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User')
 
-    def __init__(self, username ,message):
-        self.username = username
+    def __init__(self, message):
         self.message = message
         self.is_deleted = 0
         self.timestamp = datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
@@ -63,6 +76,7 @@ def about():
 ########################
 ## user function
 ########################
+
 @app.route('/create_user')
 def create_user():
     if 'username' in session:
@@ -146,13 +160,11 @@ def message_board():
     
     #render message to web
     message_list = Message.query.order_by(Message.id).all()
-    if 'username' not in session:
-        username = None
-    else :
-        username = session['username']
-    #print(username)
-    return render_template('board.html', message_list = message_list, username=username)
+    return render_template('board.html', message_list = message_list)
 
+
+    #print(username)
+    
 
 @app.route('/add_message',methods=['POST'])
 def add_message():
@@ -168,9 +180,13 @@ def add_message():
     
     ## add message to db 
     message = request.form.get('message')
-    new_message = Message(username,message)
+    user = User.query.filter_by(username=username).first()
+    new_message = Message(message=message)
+    new_message.user = user
     db.session.add(new_message)
     db.session.commit()
+
+
     return redirect('message_board')
 
 @app.route('/delete_message',methods=['POST'])
@@ -186,7 +202,7 @@ def delete_message():
     message = Message.query.filter_by(id=msg_id).first()
     
     ## check username == current user 
-    if session['username'] != message.username :
+    if session['username'] != message.user.username :
         flash("You are not the owner of this message.")
         return redirect('message_board')   
     
@@ -197,6 +213,75 @@ def delete_message():
 
     flash("Delete Success")
     return redirect('message_board')    
+
+###################
+# upload img
+###################
+
+@app.route('/upload_img')
+def upload_img():
+    if 'username' not in session:
+        flash("Please Login First")
+        return redirect('create_user')     
+    return render_template('upload.html')
+
+## flask doc :https://flask.palletsprojects.com/en/2.2.x/patterns/fileuploads/
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/uploader',methods=['POST'])
+def uploader():
+    
+    # not login 
+    if 'username' not in session:
+        flash("Please Login First")
+        return redirect('create_user')   
+
+    ## no file upload 
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect('/upload_img')   
+
+    file = request.files['file']
+
+    ## no file selected
+    if file.filename == '':
+        flash('No selected file')
+        return redirect('/upload_img') 
+
+    ### check file extension 
+    if not allowed_file(file.filename):
+        flash('Please upload .jpg or .png extension')
+        return redirect('/upload_img')
+
+    ## check file type 
+
+    tmp_filetype = filetype.guess(file.read())
+    file.seek(0)
+
+    ## file no magic number (empty file or text file)
+    if tmp_filetype == None :
+        flash('Please upload jpg or png image')
+        return redirect('/upload_img')   
+    
+    ## check mime type
+    file_mime = tmp_filetype.mime     
+    if file_mime != 'image/png' and file_mime != 'image/jpeg' :
+        flash('Please upload jpg or png image')
+        return redirect('/upload_img')
+
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config['UPLOAD_PATH'],filename)
+    file.save(filepath)
+
+    ##  add filename to user db 
+    user = User.query.filter_by(username=session['username']).first()
+    user.img_name = filename
+    db.session.commit()
+
+    flash('Upload Success')
+    return redirect('/upload_img')  
 
 
 ###################
@@ -234,8 +319,7 @@ def drop_db():
     db.drop_all()
     return redirect('/')
 
-## TODO : add message board db, add/delete function 
 
 
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=8000,debug=False)
+	app.run(host='0.0.0.0', port=8000,debug=True)
