@@ -21,7 +21,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = sql_url
 #app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 db = SQLAlchemy(app)
 
-max_len = 25
+max_len = 100
 
 ### setup timezone
 from datetime import datetime, timezone, timedelta
@@ -104,7 +104,8 @@ def login():
         return len(password) < 1 and len(username) < 1 
     
     def is_only_number_letter(username,password):
-        return regex.match(username) and  regex.match(password)
+        return True
+        #return regex.match(username) and  regex.match(password)
 
     def is_max_len(username,password):
         return len(username) > max_len or len(password) > max_len 
@@ -156,12 +157,14 @@ def logout():
 
 @app.route('/user')
 def user():
+    user_list = User.query.order_by(User.id).all()
+
     engine = create_engine(sql_url, echo = False)
     user_table = pd.read_sql_table(table_name="users", con=engine)
     result = user_table[["id","username"]].to_json(orient="records")
     parsed = json.loads(result)  
     result = json.dumps(parsed, indent=4)
-    return render_template('user.html',user_data=result)
+    return render_template('user.html',user_data=user_list)
 
 ####################
 # message board
