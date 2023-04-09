@@ -158,12 +158,6 @@ def logout():
 @app.route('/user')
 def user():
     user_list = User.query.order_by(User.id).all()
-
-    engine = create_engine(sql_url, echo = False)
-    user_table = pd.read_sql_table(table_name="users", con=engine)
-    result = user_table[["id","username"]].to_json(orient="records")
-    parsed = json.loads(result)  
-    result = json.dumps(parsed, indent=4)
     return render_template('user.html',user_data=user_list)
 
 ####################
@@ -287,7 +281,7 @@ def uploader():
         flash('Please upload jpg or png image')
         return redirect('/upload_img')
 
-    ## TODO : if same filename/ then change upload filename like add some random bytes
+    ## If same filename/ then change upload filename like add some random bytes
     filename = secure_filename(file.filename)
     filepath = os.path.join(app.config['UPLOAD_PATH'],filename)
     
