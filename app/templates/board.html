@@ -2,6 +2,13 @@
 {% autoescape true %}
 
 
+<div class="box my-3 ">
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <div class="container-sm alert alert-danger" role="alert">
+        {{ messages[0] }}
+    </div>
+    {% endif %} {% endwith %}
+</div>
 <div class="container-sm  alert alert-primary ">
     <main role="main" class="container bootdey.com">
         {% for message in message_list %}
@@ -10,25 +17,41 @@
         {% if message.user.username == session['username'] %}
 
         <div class="my-3 p-3 bg-white rounded box-shadow">
-            <div class="media text-muted pt-3">
-                <div class="row justify-content-between">
-                    <div class="col-4">
-                        <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-3 rounded" width="32" height="32">
+            <div class="media text-muted pt-2">
+                <div class="row justify-content-md-center">
+                    <div class="col-2">
+                        <div class="row">
+                            <div class="col-12">
+                                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-3 rounded" width="32" height="32">
+                            </div>
+                            <div class="col">
+                                <strong class="d-block text-gray-dark"><font size="-1">@{{message.user.username}}</font></strong>
+                            </div>
+                        </div>
+
+                        
                     </div>
+                    <div class="col-5" style="word-wrap: break-word">{{message.message}}</div>
                     <div class="col-2">
                         <form action="/delete_message" method="post">
                             <input type="hidden" name="msg_id" value="{{message.id}}">
-                            <button class="btn btn-danger" role="button" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"><i class="fa fa-trash"></i></button>
+                            <button class="btn btn-danger" role="button"
+                                style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"><i
+                                    class="fa fa-trash"></i></button>
                         </form>
+                        <strong class="d-block text-gray-dark"><font size="-1">{{message.timestamp}}</font></strong>
                     </div>
 
                 </div>
 
-                <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                    <strong class="d-block text-gray-dark">@{{message.user.username}}</strong>
-                    {{message.message}}
-
-                </p>
+                <div class="row justify-content-md-center">
+                    <div class="col-2">
+                    </div>
+                    <div class="col-5" style="word-wrap: break-word"></div>
+                    <div class="col-2"></div>
+                    <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray"></p>
+                    </p>
+                </div>
 
             </div>
 
@@ -37,14 +60,34 @@
         {% else %}
 
         <div class="my-3 p-3 bg-white rounded box-shadow">
-            <div class="media text-muted pt-3">
-                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-2 rounded"
-                    width="32" height="32">
-                <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                    <strong class="d-block text-gray-dark">@{{message.user.username}}</strong>
-                    {{message.message}}
-                </p>
+            <div class="media text-muted pt-2">
+                <div class="row justify-content-md-center">
+                    <div class="col-2">
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-3 rounded" width="32" height="32">
+                            </div>
+                            <div class="col">
+                                <strong class="d-block text-gray-dark"><font size="-1">@{{message.user.username}}</font></strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-5" style="word-wrap: break-word">{{message.message}}</div>
+                    <div class="col-2"></div>
+                </div>
+
+                <div class="row justify-content-md-center">
+                    <div class="col-2">
+                    </div>
+                    <div class="col-5"></div>
+                    <div class="col-2"><strong class="d-block text-gray-dark"><font size="-1">{{message.timestamp}}</font></strong></div>
+                    <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray"></p>
+                    </p>
+                </div>
+
             </div>
+
         </div>
 
         {% endif %}
@@ -52,14 +95,33 @@
         {% else %}
 
         <div class="my-3 p-3 bg-white rounded box-shadow">
-            <div class="media text-muted pt-3">
-                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-2 rounded"
-                    width="32" height="32">
-                <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                    <strong class="d-block text-gray-dark">@{{message.user.username}}</strong>
-                    Message Delete
-                </p>
+            <div class="media text-muted pt-2">
+                <div class="row justify-content-md-center">
+                    <div class="col-2">
+                        <div class="row">
+                            <div class="col-12">
+                                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-3 rounded" width="32" height="32">
+                            </div>
+                            <div class="col">
+                                <strong class="d-block text-gray-dark"><font size="-1">@{{message.user.username}}</font></strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-5" style="word-wrap: break-word" >Message Deleted</div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="row justify-content-md-center">
+                    <div class="col-2">
+                    </div>
+                    <div class="col-5"></div>
+                    <div class="col-2"><strong class="d-block text-gray-dark"><font size="-1">{{message.timestamp}}</font></strong></div>
+                    <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray"></p>
+                    </p>
+                </div>
+
+
             </div>
+
         </div>
 
 
@@ -93,6 +155,7 @@
         </div>
     </div>
 </div>
+
 {% endautoescape %}
 
 

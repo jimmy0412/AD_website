@@ -5,7 +5,8 @@ import pandas as pd
 import os
 import json
 import re
-
+import random
+import string
 app = Flask(__name__)
 app.secret_key = os.urandom(32)
 
@@ -19,6 +20,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = sql_url
 #app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 db = SQLAlchemy(app)
+
+max_len = 25
 
 ### setup timezone
 from datetime import datetime, timezone, timedelta
@@ -41,9 +44,9 @@ class User(db.Model):
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    username = db.Column(db.String(30),unique=True,nullable=False)
-    password = db.Column(db.String(30),nullable=False)
-    img_name = db.Column(db.String(50),nullable=False)
+    username = db.Column(db.String(max_len),unique=True,nullable=False)
+    password = db.Column(db.String(max_len),nullable=False)
+    img_name = db.Column(db.String(128),nullable=False)
 
     def __init__(self,username,password):
         self.username = username
@@ -54,9 +57,9 @@ class Message(db.Model):
     __tablename__ = 'message'
     
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    message = db.Column(db.String(256),nullable=False)
+    message = db.Column(db.String(1024),nullable=False)
     is_deleted = db.Column(db.Boolean)
-    timestamp =  db.Column(db.String(256),nullable=False)
+    timestamp =  db.Column(db.String(30),nullable=False)
     uid = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User')
 
@@ -103,8 +106,13 @@ def login():
     def is_only_number_letter(username,password):
         return regex.match(username) and  regex.match(password)
 
+    def is_max_len(username,password):
+        return len(username) > max_len or len(password) > max_len 
+     
     username = request.form.get('username')
     password = request.form.get('password')
+
+    
 
     user = User.query.filter_by(username=username).first()
     ## user don't exits
@@ -118,6 +126,9 @@ def login():
             flash("Only numbers, letters and dashes are allowed")
             return redirect("/create_user")
 
+        if is_max_len(username,password) :
+            flash(f"Exceed Max Length {max_len}")
+            return redirect("/create_user")            
         ### create user to db 
         new_user = User(username,password)
         db.session.add(new_user)
@@ -273,8 +284,14 @@ def uploader():
         flash('Please upload jpg or png image')
         return redirect('/upload_img')
 
+    ## TODO : if same filename/ then change upload filename like add some random bytes
     filename = secure_filename(file.filename)
     filepath = os.path.join(app.config['UPLOAD_PATH'],filename)
+    
+    while os.path.isfile(filepath) :
+        filename = ''.join(random.choice(string.ascii_letters) for _ in range(4)) + filename
+        filepath = os.path.join(app.config['UPLOAD_PATH'],filename)
+
     file.save(filepath)
 
     ##  add filename to user db 
