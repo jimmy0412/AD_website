@@ -85,6 +85,7 @@ def about():
 @app.route('/create_user')
 def create_user():
     if 'username' in session:
+        flash('Please Logout First')
         return redirect('/')
 	
     return render_template('create_user.html')
@@ -94,6 +95,7 @@ def login():
 
     # already login 
     if 'username' in session:
+        flash('Please Logout First')
         return redirect('/')    
 
     # check password
@@ -147,11 +149,13 @@ def login():
     
     ### valid user / login and create session 
     session['username'] = username
+    flash('Login Success, Welcome')
     return redirect("/")
 
 @app.route('/logout')
 def logout():
     session.clear()
+    flash('Login Success, Welcome')
     return redirect("/")
 
 
