@@ -1,16 +1,23 @@
 {% extends "base.html" %} {% block content %}
 {% autoescape true %}
 
-
+<script>
+    function scrolltoMessageBox() {
+        var access = document.getElementById("message_box");
+        access.scrollIntoView({ behavior: 'smooth' }, true);
+    }
+</script>
 <div class="box my-3 ">
     {% with messages = get_flashed_messages() %} {% if messages %}
     <div class="container-sm alert alert-danger" role="alert">
         {{ messages[0] }}
     </div>
     {% endif %} {% endwith %}
+
 </div>
 <div class="container-sm  alert alert-primary ">
     <main role="main" class="container bootdey.com">
+        <button onclick="scrolltoMessageBox()" class="btn btn-success">Send New Message</button>
         {% for message in message_list %}
         {% if message.is_deleted == 0 %}
 
@@ -22,14 +29,17 @@
                     <div class="col-2">
                         <div class="row">
                             <div class="col-12">
-                                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-3 rounded" width="32" height="32">
+                                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt=""
+                                    class="mr-3 rounded" width="32" height="32">
                             </div>
                             <div class="col">
-                                <strong class="d-block text-gray-dark"><font size="-1">@{{message.user.username}}</font></strong>
+                                <strong class="d-block text-gray-dark">
+                                    <font size="-1">@{{message.user.username}}</font>
+                                </strong>
                             </div>
                         </div>
 
-                        
+
                     </div>
                     <div class="col-5" style="word-wrap: break-word">{{message.message}}</div>
                     <div class="col-2">
@@ -39,7 +49,9 @@
                                 style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"><i
                                     class="fa fa-trash"></i></button>
                         </form>
-                        <strong class="d-block text-gray-dark"><font size="-1">{{message.timestamp}}</font></strong>
+                        <strong class="d-block text-gray-dark">
+                            <font size="-1">{{message.timestamp}}</font>
+                        </strong>
                     </div>
 
                 </div>
@@ -63,13 +75,16 @@
             <div class="media text-muted pt-2">
                 <div class="row justify-content-md-center">
                     <div class="col-2">
-                        
+
                         <div class="row">
                             <div class="col-12">
-                                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-3 rounded" width="32" height="32">
+                                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt=""
+                                    class="mr-3 rounded" width="32" height="32">
                             </div>
                             <div class="col">
-                                <strong class="d-block text-gray-dark"><font size="-1">@{{message.user.username}}</font></strong>
+                                <strong class="d-block text-gray-dark">
+                                    <font size="-1">@{{message.user.username}}</font>
+                                </strong>
                             </div>
                         </div>
                     </div>
@@ -81,7 +96,9 @@
                     <div class="col-2">
                     </div>
                     <div class="col-5"></div>
-                    <div class="col-2"><strong class="d-block text-gray-dark"><font size="-1">{{message.timestamp}}</font></strong></div>
+                    <div class="col-2"><strong class="d-block text-gray-dark">
+                            <font size="-1">{{message.timestamp}}</font>
+                        </strong></div>
                     <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray"></p>
                     </p>
                 </div>
@@ -100,21 +117,26 @@
                     <div class="col-2">
                         <div class="row">
                             <div class="col-12">
-                                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt="" class="mr-3 rounded" width="32" height="32">
+                                <img src="{{url_for('static',filename='img/' + message.user.img_name)}}" alt=""
+                                    class="mr-3 rounded" width="32" height="32">
                             </div>
                             <div class="col">
-                                <strong class="d-block text-gray-dark"><font size="-1">@{{message.user.username}}</font></strong>
+                                <strong class="d-block text-gray-dark">
+                                    <font size="-1">@{{message.user.username}}</font>
+                                </strong>
                             </div>
                         </div>
                     </div>
-                    <div class="col-5" style="word-wrap: break-word" >Message Deleted</div>
+                    <div class="col-5" style="word-wrap: break-word">Message Deleted</div>
                     <div class="col-2"></div>
                 </div>
                 <div class="row justify-content-md-center">
                     <div class="col-2">
                     </div>
                     <div class="col-5"></div>
-                    <div class="col-2"><strong class="d-block text-gray-dark"><font size="-1">{{message.timestamp}}</font></strong></div>
+                    <div class="col-2"><strong class="d-block text-gray-dark">
+                            <font size="-1">{{message.timestamp}}</font>
+                        </strong></div>
                     <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray"></p>
                     </p>
                 </div>
@@ -133,7 +155,7 @@
 
 
 <div class="d-grid gap-3 p-5">
-    <div class="container text-center alert alert-success ">
+    <div class="container text-center alert alert-success " id="message_box">
         <h3 class="title mb-3">Message Box</h3>
         <div class="box">
             {% with messages = get_flashed_messages() %} {% if messages %}
