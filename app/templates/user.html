@@ -20,18 +20,18 @@
                         <tr class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
                             <th >User ID</th>
                             <th >User Icon</th>        
-                            <th colspan="2">User Name</th>
+                            <th >User Name</th>
                             
                         </tr>
                         {% for user in user_data %}
                         <tr class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                            <td colspan="1">{{user.id}}</td>
-                            <td colspan="1">
+                            <td width="10%">{{user.id}}</td>
+                            <td width="10%">
                                 <img src="{{url_for('static',filename='img/' + user.img_name)}}" alt=""
                                 class="mr-3 rounded" width="32" height="32">
                             </td>
                             
-                            <td>{{user.username}}</td>
+                            <td style="word-wrap: break-word">{{user.username}}</td>
                         </tr>
                         
                         {% endfor %}
