@@ -333,9 +333,14 @@ def check_message_db():
     result = json.dumps(parsed, indent=4) 
     return result
 
-@app.route('/drop_db_gkdjkflsdflksdjfkldsjflkjdsl')
-def drop_db():
+@app.route('/init_db_gkdjkflsdflksdjfkldsjflkjdsl')
+def init_db():
     db.drop_all()
+    db.create_all() 
+    new_user = User('Betray','ccccc')
+    db.session.add(new_user)
+    db.session.commit()
+
     return redirect('/')
 
 
