@@ -155,7 +155,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    flash('Login Success, Welcome')
+    flash('Logout Success, see you next time')
     return redirect("/")
 
 
