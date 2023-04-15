@@ -48,16 +48,16 @@ class User(db.Model):
     password = db.Column(db.String(max_len),nullable=False)
     img_name = db.Column(db.String(128),nullable=False)
 
-    def __init__(self,username,password):
+    def __init__(self,username,password,img_name='bible.jpg'):
         self.username = username
         self.password = password
-        self.img_name = 'bible.jpg'
+        self.img_name = img_name
 
 class Message(db.Model):
     __tablename__ = 'message'
     
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    message = db.Column(db.String(1024),nullable=False)
+    message = db.Column(db.String(4096),nullable=False)
     is_deleted = db.Column(db.Boolean)
     timestamp =  db.Column(db.String(30),nullable=False)
     uid = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -338,13 +338,13 @@ def check_message_db():
 def init_db():
     db.drop_all()
     db.create_all() 
-    new_user = User('Betray','ccccc')
+    new_user = User('Betray','gjdklgjdlkghdfgkjl','home.png')
     db.session.add(new_user)
     db.session.commit()
 
     return redirect('/')
 
 
-
+## TODO : debug=False
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=8000,debug=True)
+	app.run(host='0.0.0.0', port=8000,debug=False)
