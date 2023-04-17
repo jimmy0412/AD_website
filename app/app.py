@@ -8,7 +8,7 @@ import re
 import random
 import string
 app = Flask(__name__)
-app.secret_key = os.urandom(32)
+app.secret_key = os.urandom(64)
 
 #############
 ### setup sql
